@@ -1,0 +1,4 @@
+fastmcp
+aiosqlite
+pytest
+pytest-asyncio
