@@ -1,6 +1,6 @@
 # test_server.py
 import pytest
-from fastmcp.client import Client
+from fastmcp import Client
 from fastmcp.exceptions import ToolError
 from server import mcp, init_db
 
@@ -13,7 +13,7 @@ async def setup_db(tmp_path, monkeypatch):
 
 @pytest.fixture
 async def client():
-    async with Client(transport=mcp) as c:
+    async with Client(mcp) as c:
         yield c
 
 async def test_add_and_search(client):
