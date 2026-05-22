@@ -10,3 +10,5 @@ notes.db
 .env.*
 logs/
 tmp/
+AGENTS.md
+CLAUDE.md
