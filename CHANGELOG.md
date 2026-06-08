@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Remote deployment support (companion to blog Part 2):
+  - HTTP transport via `MCP_TRANSPORT=http` (with `HOST`/`PORT` env overrides); STDIO remains the default.
+  - Bearer-token auth gate via `build_auth()` + `MCP_TOKEN`, using FastMCP's `StaticTokenVerifier`. No token means no gate (local STDIO use).
+  - `create_app()` / `app` ASGI entry point for `uvicorn server:app`, wiring `init_db()` into the startup lifespan.
+  - `Dockerfile` and a `uvicorn` dependency pin.
+  - Tests covering the auth-gate wiring.
+
 ### Changed
 
 - Bumped the FastMCP pin to a verified compatible set:

@@ -2,7 +2,8 @@
 import pytest
 from fastmcp import Client
 from fastmcp.exceptions import ToolError
-from server import mcp, init_db
+from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
+from server import mcp, init_db, build_auth
 
 @pytest.fixture(autouse=True)
 async def setup_db(tmp_path, monkeypatch):
@@ -45,3 +46,13 @@ async def test_list_tools(client):
     assert "add_note" in tool_names
     assert "search_notes" in tool_names
     assert "delete_note" in tool_names
+
+def test_build_auth_disabled_without_token():
+    """No MCP_TOKEN means no auth gate (local STDIO use)."""
+    assert build_auth(None) is None
+    assert build_auth("") is None
+
+def test_build_auth_returns_verifier_with_token():
+    """A token wires up a bearer-token gate for remote HTTP use."""
+    verifier = build_auth("some-secret-token")
+    assert isinstance(verifier, StaticTokenVerifier)

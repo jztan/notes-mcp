@@ -1,5 +1,6 @@
 import aiosqlite
 import asyncio
+import os
 from contextlib import asynccontextmanager
 from fastmcp import FastMCP
 from fastmcp.dependencies import Depends
@@ -19,7 +20,24 @@ async def get_db():
     finally:
         await db.close()
 
-mcp = FastMCP("Notes")
+def build_auth(token):
+    """Build a bearer-token gate from a secret, or None when unset.
+
+    StaticTokenVerifier stores tokens in plaintext and is meant for
+    development or a single-user server behind a VPN. For a public,
+    multi-tenant server, swap it for JWTVerifier or OAuth 2.1 (the tools
+    do not change). See the deployment notes in README.md.
+    """
+    if not token:
+        return None
+    from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
+
+    return StaticTokenVerifier(
+        tokens={token: {"client_id": "primary", "scopes": ["notes:use"]}},
+        required_scopes=["notes:use"],
+    )
+
+mcp = FastMCP("Notes", auth=build_auth(os.environ.get("MCP_TOKEN")))
 
 @mcp.tool
 async def add_note(
@@ -122,6 +140,36 @@ async def init_db():
         )
         await db.commit()
 
+def create_app():
+    """ASGI app for HTTP deployment: `uvicorn server:app`.
+
+    Wraps FastMCP's HTTP app so the notes table is created on startup,
+    then hands off to FastMCP's own session-manager lifespan.
+    """
+    http_app = mcp.http_app()
+    inner_lifespan = http_app.router.lifespan_context
+
+    @asynccontextmanager
+    async def lifespan(app):
+        await init_db()
+        async with inner_lifespan(app):
+            yield
+
+    http_app.router.lifespan_context = lifespan
+    return http_app
+
+
+# Exposed for production servers: `uvicorn server:app --host 0.0.0.0 --port 8000`
+app = create_app()
+
 if __name__ == "__main__":
     asyncio.run(init_db())
-    mcp.run()
+    transport = os.environ.get("MCP_TRANSPORT", "stdio")
+    if transport == "http":
+        mcp.run(
+            transport="http",
+            host=os.environ.get("HOST", "0.0.0.0"),
+            port=int(os.environ.get("PORT", "8000")),
+        )
+    else:
+        mcp.run()
