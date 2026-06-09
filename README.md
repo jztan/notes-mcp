@@ -2,8 +2,8 @@
 
 A sample MCP (Model Context Protocol) server that manages notes in SQLite, built with [FastMCP 3](https://gofastmcp.com). Companion repo for two blog posts:
 
-- Part 1: [How to Build an MCP Server in Python (Step-by-Step)](https://blog.jztan.com/how-to-build-an-mcp-server-in-python-step-by-step/) — the local STDIO server.
-- Part 2: [How to Deploy a Python MCP Server: Remote HTTP, Auth, and Docker](https://blog.jztan.com/how-to-deploy-a-python-mcp-server/) — taking it remote.
+- Part 1: [How to Build an MCP Server in Python (Step-by-Step)](https://blog.jztan.com/how-to-build-an-mcp-server-in-python-step-by-step/?utm_source=github&utm_medium=readme&utm_campaign=notes-mcp) — the local STDIO server.
+- Part 2: [How to Deploy a Python MCP Server: Remote HTTP, Auth, and Docker](https://blog.jztan.com/how-to-deploy-a-python-mcp-server/?utm_source=github&utm_medium=readme&utm_campaign=notes-mcp) — taking it remote.
 
 ## Setup
 
